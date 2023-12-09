@@ -46,7 +46,7 @@ return new class extends Migration
 	    $table->foreignId('author_id')->constrained(
 		table: 'author', indexName: 'news_author_id'
 	    );
-            $table->string('external_link');
+            $table->string('external_link')->unique();
         });
         
         Schema::create('news_keyword', function (Blueprint $table) {

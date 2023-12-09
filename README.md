@@ -22,7 +22,7 @@
     ./vendor/bin/sail up -d
     ```
 
-- To migrate the database
+- To migrate the database (if you get an error, wait a minute or two and try again, the database may still be getting up)
     ```
     ./vendor/bin/sail artisan migrate
     ```

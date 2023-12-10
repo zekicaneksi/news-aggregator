@@ -25,7 +25,30 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/fetch-news', function () {
+Route::get('/fetch-news-local', function () {
+
+	function getJsonFromStorage($fileName){
+		$json_response = Storage::disk('local')->get('news_data/'.$fileName);
+		$json_response = json_decode($json_response, true);
+		
+		return $json_response;
+	}
+
+	processNewsApi(getJsonFromStorage('newsapi.json'));
+	processTimesApi(getJsonFromStorage('nytimes.json'));
+	
+	for ($i = 1; $i <= 6; $i++) {
+		processGuardianApi(getJsonFromStorage('guardian'.$i.'.json'));
+	} 
+	
+    
+	return 'OK';
+});
+
+Route::get('/fetch-news-remote', function () {
+    
+	return 'OK';
+});
 
 	// Extracts keywords from a text
 	function extractKeywords($text) {
@@ -113,9 +136,7 @@ Route::get('/fetch-news', function () {
 			return $news;
 	}
 
-	function processNewsApi() {
-		$json_response = Storage::disk('local')->get('newsapi.json');
-		$json_response = json_decode($json_response, true);
+	function processNewsApi($json_response) {
 		
 		foreach ($json_response['articles'] as $key => $value) {
 		
@@ -143,9 +164,7 @@ Route::get('/fetch-news', function () {
 		}
 	}
 	
-	function processGuardianApi(){
-		$json_response = Storage::disk('local')->get('guardian.json');
-		$json_response = json_decode($json_response, true);	
+	function processGuardianApi($json_response){
 		
 		foreach ($json_response['response']['results'] as $key => $value) {
 		
@@ -169,9 +188,7 @@ Route::get('/fetch-news', function () {
 		}
 	}
 	
-	function processTimesApi(){
-		$json_response = Storage::disk('local')->get('nytimes.json');
-		$json_response = json_decode($json_response, true);	
+	function processTimesApi($json_response){
 		
 		foreach ($json_response['response']['docs'] as $key => $value) {
 		
@@ -209,13 +226,3 @@ Route::get('/fetch-news', function () {
 			);
 		}
 	}
-	
-
-	//processNewsApi();
-	//processGuardianApi();
-	processTimesApi();
-	
-	
-    
-    return 'OK';
-});

@@ -52,7 +52,7 @@ class News
 		}
 	}
 	
-	function prepareAndSaveNews($headline, $multimedia_url, $lead_paragraph, $category, $date, $source, $author, $external_link, $keywords){
+	static function prepareAndSaveNews($headline, $multimedia_url, $lead_paragraph, $category, $date, $source, $author, $external_link, $keywords){
 
 			$category = Category::firstOrCreate(
 			    ['name' => $category]
@@ -113,11 +113,11 @@ class News
 
 			$extracted_keywords = News::extractKeywords($leadParagraph);
 			
-			$inserted_news = prepareAndSaveNews(
+			$inserted_news = News::prepareAndSaveNews(
 				$value['title'],
 				$value['urlToImage'],
 				$value['description'],
-				extractKeywords($value['title'])[0],
+				News::extractKeywords($value['title'])[0],
 				$value['publishedAt'],
 				$value['source']['name'],
 				$value['author'],
@@ -137,7 +137,7 @@ class News
 				continue;
 			}
 			
-			$inserted_news = prepareAndSaveNews(
+			$inserted_news = News::prepareAndSaveNews(
 				$value['webTitle'],
 				$value['fields']['thumbnail'],
 				$value['fields']['bodyText'],
@@ -176,7 +176,7 @@ class News
 				array_push($keywords, $keyword['value']);
 			}
 			
-			$inserted_news = prepareAndSaveNews(
+			$inserted_news = News::prepareAndSaveNews(
 				$value['headline']['main'],
 				"https://www.nytimes.com/".$value['multimedia'][0]['url'],
 				$value['abstract'],

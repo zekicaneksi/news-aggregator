@@ -43,6 +43,14 @@ Route::get('/fetch-news', function () {
 
 	    // Clear empty words
 	    $words = array_filter($words);
+	    
+	    // Remove numeric and less than 3 character words
+	    $words = array_filter($words, function($var) {
+		  if(strlen($var) < 3 || is_numeric($var)){
+		  	return false;
+		  }
+		  return true;	    
+	    });
 
 	    // Return the first 5 words
 	    return array_slice($words, 0, 5);

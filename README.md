@@ -37,5 +37,5 @@ To delete the project's docker resources including the volumes
 
 The project starts with an empty database.
 - If you've filled the required API keys in the `.env` file, a request to `/fetch-news-remote` fetches the newest news and populates the database.
-    - A cronjob is also created in `app/Console/Kernel.php` file fetches the remote news daily.
+    - A cronjob is also created in `app/Console/Kernel.php` file that fetches the remote news daily.
 - If you don't have API keys, you can make a request to `/fetch-news-local` to populate the database from example responses that are in the repository.

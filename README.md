@@ -2,31 +2,16 @@
 
 ## Setting Up The Project
 
-- Get the env files from the example env file;
-    ```
-    cp .env.example .env
-    ```
+In the main directory, run;
 
-- To install dependencies;
-    ```
-    composer install
-    ```
-
-- To generate a Laravel app key;
-    ```
-    php artisan key:generate
-    ```
-
-- To run the project locally
-    ```
-    ./vendor/bin/sail up -d
-    ```
-
-- To migrate the database (if you get an error, wait a minute or two and try again, the database may still be getting up)
-    ```
-    ./vendor/bin/sail artisan migrate
-    ```
-
+```
+cp .env.example .env # get the env files from the example env file
+composer install # install dependencies
+php artisan key:generate # generate a Laravel app key
+./vendor/bin/sail up -d # run the project locally
+until ./vendor/bin/sail artisan migrate; do echo -e "\n\n ---- waiting for database to get up"; sleep 3; done; # migrate the database
+```
+    
 The project is now set up and running at `127.0.0.1:80`.
 
 Phpmyadmin is accessible at `127.0.0.1:8081` with these credentials;
@@ -49,3 +34,7 @@ To delete the project's docker resources including the volumes
 ```
 ./vendor/bin/sail down -v
 ```
+
+The project starts with empty database.
+- If you've filled the required API keys in the `.env` file, a request to `/fetch-news-remote` fetches the newest news and populates the database.
+- If you don't have API keys, you can make a request to `/fetch-news-local` to populate the database from example responses that are in the repository.

@@ -2,10 +2,22 @@
 
 ## Setting Up The Project
 
-In the main directory, run;
+**Important: For production, `.env` files must be set and hidden by YOU! The given `.env` files here are examples**
 
+To create the `.env` file, run;
 ```
 cp .env.example .env # get the env files from the example env file
+```
+
+The app is able to fetch data from these API's;
+- The Guardian
+- NewsAPI
+- New York Times
+
+If you wish to fetch data from the given API's, the required API_KEYS should be obtained and set in the `.env` file.
+
+To run the project and set up the database, run;
+```
 composer install # install dependencies
 php artisan key:generate # generate a Laravel app key
 ./vendor/bin/sail up -d # run the project locally

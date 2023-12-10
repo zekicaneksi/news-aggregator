@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\Route;
 
 use App\Classes\News;
 
-use Illuminate\Support\Facades\Http;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes

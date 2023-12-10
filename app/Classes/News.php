@@ -11,11 +11,37 @@ use App\Models\Category;
 use App\Models\News as NewsModel;
 use App\Models\NewsKeywords;
 
+use Illuminate\Support\Facades\Http;
+
 class News
 {
 
 	static function fetchDataFromRemote(){
-		return 'OK';
+	
+		$NEWS_GUARDIAN_KEY = env('NEWS_GUARDIAN_KEY');
+		$NEWS_NEWSAPI_KEY = env('NEWS_NEWSAPI_KEY');
+		$NEWS_TIMES_KEY = env('NEWS_TIMES_KEY');
+	
+		// Getting The Guardian News
+		if($NEWS_GUARDIAN_KEY){
+			for ($i = 1; $i <= 6; $i++) {
+				$response = Http::get('https://content.guardianapis.com/search?page='.$i.'&order-by=newest&show-fields=all&api-key='.$NEWS_GUARDIAN_KEY);
+				News::processGuardianApi($response);
+			}
+		}
+		
+		// Getting NewsApi News
+		if($NEWS_NEWSAPI_KEY){
+			$response = Http::get('https://newsapi.org/v2/everything?q=Apple&apiKey='.$NEWS_NEWSAPI_KEY);
+			News::processNewsApi($response);
+		}
+		
+		// Getting New York Times News
+		if($NEWS_TIMES_KEY){
+			$response = Http::get('https://api.nytimes.com/svc/archive/v1/'.date("Y").'/'.date("m").'.json?api-key='.$NEWS_TIMES_KEY);
+			News::processTimesApi($response);
+		}
+		
 	}
 	
    	// Extracts keywords from a text
@@ -105,6 +131,10 @@ class News
 	}
 
 	static function processNewsApi($json_response) {
+	
+		if (!isset($json_response['articles'])) {
+			return;
+		}
 		
 		foreach ($json_response['articles'] as $key => $value) {
 		
@@ -133,6 +163,10 @@ class News
 	}
 	
 	static function processGuardianApi($json_response){
+	
+		if (!isset($json_response['response']['results'])) {
+			return;
+		}
 		
 		foreach ($json_response['response']['results'] as $key => $value) {
 		
@@ -157,6 +191,10 @@ class News
 	}
 	
 	static function processTimesApi($json_response){
+	
+		if (!isset($json_response['response']['docs'])) {
+			return;
+		}
 		
 		foreach ($json_response['response']['docs'] as $key => $value) {
 		

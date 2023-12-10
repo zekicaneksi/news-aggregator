@@ -13,6 +13,11 @@ use App\Models\NewsKeywords;
 
 class News
 {
+
+	static function fetchDataFromRemote(){
+		return 'OK';
+	}
+	
    	// Extracts keywords from a text
 	static function extractKeywords($text) {
 	    // Convert to lower-case

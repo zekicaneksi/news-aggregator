@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Classes\News as NewsClass;
+use App\Classes\News;
 
 use Illuminate\Support\Facades\Http;
 
@@ -30,11 +30,11 @@ Route::get('/fetch-news-local', function () {
 		return $json_response;
 	}
 
-	NewsClass::processNewsApi(getJsonFromStorage('newsapi.json'));
-	NewsClass::processTimesApi(getJsonFromStorage('nytimes.json'));
+	News::processNewsApi(getJsonFromStorage('newsapi.json'));
+	News::processTimesApi(getJsonFromStorage('nytimes.json'));
 	
 	for ($i = 1; $i <= 6; $i++) {
-		NewsClass::processGuardianApi(getJsonFromStorage('guardian'.$i.'.json'));
+		News::processGuardianApi(getJsonFromStorage('guardian'.$i.'.json'));
 	} 
 	
     
@@ -43,6 +43,7 @@ Route::get('/fetch-news-local', function () {
 
 Route::get('/fetch-news-remote', function () {
     
+    	News::fetchDataFromRemote();
 	return 'OK';
 });
 

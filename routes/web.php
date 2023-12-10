@@ -169,9 +169,51 @@ Route::get('/fetch-news', function () {
 		}
 	}
 	
+	function processTimesApi(){
+		$json_response = Storage::disk('local')->get('nytimes.json');
+		$json_response = json_decode($json_response, true);	
+		
+		foreach ($json_response['response']['docs'] as $key => $value) {
+		
+			// TimesApi returns very big responses, skip after 100
+			if($key === 100) {
+				break;
+			}
+		
+			if (count($value['multimedia']) === 0) {
+				continue;
+			}
+		
+			$external_link = $value['web_url'];
+			
+			if (doesNewsExist($external_link) !== false) {
+				continue;
+			}
+			
+			$keywords = array();
+			
+			foreach ($value['keywords'] as $keyword) {
+				array_push($keywords, $keyword['value']);
+			}
+			
+			$inserted_news = prepareAndSaveNews(
+				$value['headline']['main'],
+				"https://www.nytimes.com/".$value['multimedia'][0]['url'],
+				$value['abstract'],
+				$value['section_name'],
+				$value['pub_date'],
+				$value['source'],
+				$value['byline']['original'],
+				$external_link,
+				$keywords,
+			);
+		}
+	}
+	
 
 	//processNewsApi();
-	processGuardianApi();
+	//processGuardianApi();
+	processTimesApi();
 	
 	
     

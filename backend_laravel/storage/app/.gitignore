@@ -1,4 +1,5 @@
 *
+!news_data/**
 !news_data/
 !public/
 !.gitignore

@@ -3,32 +3,25 @@
 import styles from "./page.module.css";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
-import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  CircularProgress,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 
-function News() {
+function News(props: News) {
   return (
     <Box width={350} height={500}>
-      <Typography>
-        Death of cyclist in Berlin provokes debate over road protests
-      </Typography>
-      <Typography>theguardian.com</Typography>
-      <img
-        src={
-          "https://media.guim.co.uk/02e7c96dc4d65e549854189ddf60ae54ffe69f43/0_170_5200_3120/500.jpg"
-        }
-        width={"100%"}
-        height={200}
-        alt={"alt"}
-      />
-      <Typography>
-        he death of a cyclist after a traffic collision in Berlin has revived a
-        growing debate in Germany about climate crisis protests. Sandra Umann,
-        44, was severely injured last Monday when her bike collided with a
-        cement mixer lorry when she was cycling to wor...
-      </Typography>
+      <Typography>{props.headline}</Typography>
+      <Typography>{props.source_name}</Typography>
+      <img src={props.multimedia_url} width={"100%"} height={200} alt={"alt"} />
+      <Typography>{props.lead_paragraph}</Typography>
       <Box
         sx={{
           display: "flex",
@@ -36,8 +29,8 @@ function News() {
           justifyContent: "space-between",
         }}
       >
-        <Typography>James Dean</Typography>
-        <Typography>2023/12/24</Typography>
+        <Typography>{props.author_name}</Typography>
+        <Typography>{props.date}</Typography>
       </Box>
     </Box>
   );
@@ -58,6 +51,18 @@ type Keyword = {
   name: string;
 };
 
+type News = {
+  id: number;
+  headline: string;
+  multimedia_url: string;
+  lead_paragraph: string;
+  category_name: number;
+  date: string;
+  source_name: number;
+  author_name: number;
+  external_link: string;
+};
+
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesValue, setCategoriesValue] = useState<Category | null>(null);
@@ -71,6 +76,8 @@ export default function Home() {
 
   const [dateFromValue, setDateFromValue] = useState<Dayjs | null>(null);
   const [dateToValue, setDateToValue] = useState<Dayjs | null>(null);
+
+  const [news, setNews] = useState<News[] | null>(null);
 
   async function fetchBackend(route: string) {
     const res = await fetch("/api" + route);
@@ -88,6 +95,44 @@ export default function Home() {
     const content = await res.json();
     if (content.length !== 0) setSources(content);
   }
+
+  async function getNews() {
+    let fetchString = "/get-news?";
+
+    function addQueryParameter(queryName: string, queryValue: string | number) {
+      fetchString += queryName + "=" + queryValue + "&";
+    }
+
+    if (categoriesValue !== null)
+      addQueryParameter("category_id", categoriesValue.id);
+    if (sourcesValue !== null) addQueryParameter("source_id", sourcesValue.id);
+    if (keywordsValue !== null)
+      addQueryParameter("keyword_id", keywordsValue.id);
+    if (dateFromValue !== null)
+      addQueryParameter("date_from", dateFromValue.format("YYYY/MM/DD"));
+    if (dateToValue !== null)
+      addQueryParameter("date_to", dateToValue.format("YYYY/MM/DD"));
+
+    addQueryParameter("page", news ? news.length / 10 : 0);
+
+    let res = await fetchBackend(fetchString);
+    let content = await res.json();
+    setNews(content);
+  }
+
+  useEffect(() => {
+    if (news === null) getNews();
+  }, [news]);
+
+  useEffect(() => {
+    getNews();
+  }, [
+    categoriesValue,
+    sourcesValue,
+    keywordsInputValue,
+    dateFromValue,
+    dateToValue,
+  ]);
 
   useEffect(() => {
     if (categories.length === 0) getCategories();
@@ -118,8 +163,6 @@ export default function Home() {
       ignore = true;
     };
   }, [keywordsInputValue]);
-
-  const testArr = ["hello", "hello1", "hello2", "abc", "abc2"];
 
   return (
     <Container
@@ -223,10 +266,13 @@ export default function Home() {
             justifyContent: "space-around",
           }}
         >
-          <News />
-          <News />
-          <News />
-          <News />
+          {news ? (
+            news.map((elem) => {
+              return <News {...elem} key={elem.id} />;
+            })
+          ) : (
+            <CircularProgress />
+          )}
         </Box>
       </Grid>
     </Container>

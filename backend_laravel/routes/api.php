@@ -7,6 +7,7 @@ use App\Classes\News;
 use App\Models\Category;
 use App\Models\Source;
 use App\Models\Keyword;
+use App\Models\News as NewsModel;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,4 +66,41 @@ Route::get('/get-keywords', function (Request $request) {
     $keywords = Keyword::where('name', 'LIKE', '%'.$search.'%')->limit(20)->get();
 
     return json_encode($keywords);
+});
+
+Route::get('/get-news', function (Request $request) {
+
+    $query = DB::table('news');
+
+    if($request->has('keyword_id') ) {
+        $query->join('news_keyword', 'news.id', '=', 'news_keyword.news_id')
+              ->where('news_keyword.keyword_id', '=', $request->query('keyword_id'));
+    }
+
+    if($request->has('category_id') ) {
+        $query->where('news.category_id', '=', $request->query('category_id'));
+    }
+
+    if($request->has('source_id') ) {
+        $query->where('news.source_id', '=', $request->query('source_id'));
+    }
+
+    if($request->has('date_from') ) {
+        $query->where('news.date', '<', $request->query('date_from'));
+    }
+
+    if($request->has('date_to') ) {
+        $query->where('news.date', '>', $request->query('date_to'));
+    }
+
+
+    $query->join('author', 'author.id' , '=', 'news.id');
+    $query->join('category', 'category.id' , '=', 'news.id');
+    $query->join('source', 'source.id' , '=', 'news.id');
+
+    $query->select('author.name as author_name', 'source.name as source_name', 'headline', 'lead_paragraph', 'news.id', 'multimedia_url', 'category.name as category_name', 'external_link', 'date');
+
+    $result = $query->skip($request->query('page')*10)->take(10)->get();
+
+    return json_encode($result);
 });

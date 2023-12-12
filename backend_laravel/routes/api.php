@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Classes\News;
 use App\Models\Category;
 use App\Models\Source;
+use App\Models\Keyword;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,4 +58,11 @@ Route::get('/get-categories', function (Request $request) {
 Route::get('/get-sources', function (Request $request) {
     $sources = Source::all();
 	return json_encode($sources);
+});
+
+Route::get('/get-keywords', function (Request $request) {
+    $search=$request->get('search');
+    $keywords = Keyword::where('name', 'LIKE', '%'.$search.'%')->limit(20)->get();
+
+    return json_encode($keywords);
 });

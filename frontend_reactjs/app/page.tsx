@@ -51,15 +51,21 @@ type Source = {
   name: string;
 };
 
+type Keyword = {
+  id: number;
+  name: string;
+};
+
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesInputValue, setCategoriesInputValue] =
-    useState<Category | null>(null);
+  const [categoriesValue, setCategoriesValue] = useState<Category | null>(null);
 
   const [sources, setSources] = useState<Source[]>([]);
-  const [sourcesInputValue, setSourcesInputValue] = useState<Source | null>(
-    null,
-  );
+  const [sourcesValue, setSourcesValue] = useState<Source | null>(null);
+
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [keywordsValue, setKeywordsValue] = useState<Keyword | null>(null);
+  const [keywordsInputValue, setKeywordsInputValue] = useState<string>("");
 
   async function fetchBackend(route: string) {
     const res = await fetch("/api" + route);
@@ -69,13 +75,13 @@ export default function Home() {
   async function getCategories() {
     let res = await fetchBackend("/get-categories");
     const content = await res.json();
-    setCategories(content);
+    if (content.length !== 0) setCategories(content);
   }
 
   async function getSources() {
     let res = await fetchBackend("/get-sources");
     const content = await res.json();
-    setSources(content);
+    if (content.length !== 0) setSources(content);
   }
 
   useEffect(() => {
@@ -86,6 +92,28 @@ export default function Home() {
     if (sources.length === 0) getSources();
   }, [sources]);
 
+  useEffect(() => {
+    let ignore = false;
+
+    async function getKeywords() {
+      let res = await fetchBackend(
+        "/get-keywords?search=" + keywordsInputValue,
+      );
+      const content = await res.json();
+
+      if (!ignore) setKeywords(content);
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      getKeywords();
+    }, 1000);
+
+    return () => {
+      clearTimeout(delayDebounceFn);
+      ignore = true;
+    };
+  }, [keywordsInputValue]);
+
   const testArr = ["hello", "hello1", "hello2", "abc", "abc2"];
 
   return (
@@ -95,9 +123,28 @@ export default function Home() {
     >
       <Grid container>
         <Grid item xs={5}>
-          <TextField label="search keyword..." variant="standard">
-            search...
-          </TextField>
+          <Autocomplete
+            disablePortal
+            inputValue={keywordsInputValue}
+            onInputChange={(event, newInputValue) => {
+              setKeywordsInputValue(newInputValue);
+            }}
+            value={keywordsValue}
+            onChange={(event: any, newValue: Keyword | null) => {
+              setKeywordsValue(newValue);
+            }}
+            id="auto-complete-keyword"
+            options={keywords}
+            getOptionLabel={(option) => option.name}
+            sx={{ width: 150 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search keyword..."
+                variant={"standard"}
+              />
+            )}
+          />
         </Grid>
         <Grid item xs={7}>
           <Typography sx={{ float: "right" }}>
@@ -117,9 +164,9 @@ export default function Home() {
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               disablePortal
-              value={categoriesInputValue}
+              value={categoriesValue}
               onChange={(event: any, newValue: Category | null) => {
-                setCategoriesInputValue(newValue);
+                setCategoriesValue(newValue);
               }}
               id="auto-complete-category"
               options={categories}
@@ -133,9 +180,9 @@ export default function Home() {
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               disablePortal
-              value={sourcesInputValue}
+              value={sourcesValue}
               onChange={(event: any, newValue: Source | null) => {
-                setSourcesInputValue(newValue);
+                setSourcesValue(newValue);
               }}
               id="auto-complete-source"
               options={sources}

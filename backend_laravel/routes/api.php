@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Classes\News;
+use App\Models\Category;
+use App\Models\Source;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,24 +27,34 @@ Route::get('/fetch-news-local', function (Request $request) {
     	function getJsonFromStorage($fileName){
 		$json_response = Storage::disk('local')->get('news_data/'.$fileName);
 		$json_response = json_decode($json_response, true);
-		
+
 		return $json_response;
 	}
 
 	News::processNewsApi(getJsonFromStorage('newsapi.json'));
 	News::processTimesApi(getJsonFromStorage('nytimes.json'));
-	
+
 	for ($i = 1; $i <= 6; $i++) {
 		News::processGuardianApi(getJsonFromStorage('guardian'.$i.'.json'));
-	} 
-	
-    
+	}
+
+
 	return 'OK';
 });
 
 Route::get('/fetch-news-remote', function (Request $request) {
 
     	News::fetchDataFromRemote();
-    	
-	return 'OK';    	
+
+	return 'OK';
+});
+
+Route::get('/get-categories', function (Request $request) {
+    $categories = Category::all();
+	return json_encode($categories);
+});
+
+Route::get('/get-sources', function (Request $request) {
+    $sources = Source::all();
+	return json_encode($sources);
 });

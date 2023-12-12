@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
 function News() {
   return (
@@ -40,11 +41,50 @@ function News() {
   );
 }
 
+type Category = {
+  id: number;
+  name: string;
+};
+
+type Source = {
+  id: number;
+  name: string;
+};
+
 export default function Home() {
-  async function foo() {
-    let res = await fetch("/api/fetch-news-local");
-    console.log(res);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesInputValue, setCategoriesInputValue] =
+    useState<Category | null>(null);
+
+  const [sources, setSources] = useState<Source[]>([]);
+  const [sourcesInputValue, setSourcesInputValue] = useState<Source | null>(
+    null,
+  );
+
+  async function fetchBackend(route: string) {
+    const res = await fetch("/api" + route);
+    return res;
   }
+
+  async function getCategories() {
+    let res = await fetchBackend("/get-categories");
+    const content = await res.json();
+    setCategories(content);
+  }
+
+  async function getSources() {
+    let res = await fetchBackend("/get-sources");
+    const content = await res.json();
+    setSources(content);
+  }
+
+  useEffect(() => {
+    if (categories.length === 0) getCategories();
+  }, [categories]);
+
+  useEffect(() => {
+    if (sources.length === 0) getSources();
+  }, [sources]);
 
   const testArr = ["hello", "hello1", "hello2", "abc", "abc2"];
 
@@ -77,19 +117,33 @@ export default function Home() {
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               disablePortal
-              id="combo-box-demo"
-              options={testArr}
+              value={categoriesInputValue}
+              onChange={(event: any, newValue: Category | null) => {
+                setCategoriesInputValue(newValue);
+              }}
+              id="auto-complete-category"
+              options={categories}
+              getOptionLabel={(option) => option.name}
               sx={{ width: 150 }}
-              renderInput={(params) => <TextField {...params} label="Movie" />}
+              renderInput={(params) => (
+                <TextField {...params} label="Category" variant={"standard"} />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               disablePortal
-              id="combo-box-demo"
-              options={testArr}
+              value={sourcesInputValue}
+              onChange={(event: any, newValue: Source | null) => {
+                setSourcesInputValue(newValue);
+              }}
+              id="auto-complete-source"
+              options={sources}
+              getOptionLabel={(option) => option.name}
               sx={{ width: 150 }}
-              renderInput={(params) => <TextField {...params} label="Movie" />}
+              renderInput={(params) => (
+                <TextField {...params} label="Source" variant={"standard"} />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>

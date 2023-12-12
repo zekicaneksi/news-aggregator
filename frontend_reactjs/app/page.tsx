@@ -5,6 +5,8 @@ import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 
 function News() {
   return (
@@ -66,6 +68,9 @@ export default function Home() {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [keywordsValue, setKeywordsValue] = useState<Keyword | null>(null);
   const [keywordsInputValue, setKeywordsInputValue] = useState<string>("");
+
+  const [dateFromValue, setDateFromValue] = useState<Dayjs | null>(null);
+  const [dateToValue, setDateToValue] = useState<Dayjs | null>(null);
 
   async function fetchBackend(route: string) {
     const res = await fetch("/api" + route);
@@ -194,21 +199,19 @@ export default function Home() {
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              options={testArr}
-              sx={{ width: 150 }}
-              renderInput={(params) => <TextField {...params} label="Movie" />}
+            <DatePicker
+              label={"From"}
+              value={dateFromValue}
+              onChange={(newValue) => setDateFromValue(newValue)}
+              maxDate={dayjs()}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
-            <Autocomplete
-              disablePortal
-              id="combo-box-demo"
-              options={testArr}
-              sx={{ width: 150 }}
-              renderInput={(params) => <TextField {...params} label="Movie" />}
+            <DatePicker
+              label={"To"}
+              value={dateToValue}
+              onChange={(newValue) => setDateToValue(newValue)}
+              maxDate={dateFromValue}
             />
           </Grid>
         </Grid>

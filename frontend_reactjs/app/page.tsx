@@ -167,6 +167,20 @@ export default function Home() {
     };
   }, [keywordsInputValue]);
 
+  let renderNews;
+
+  if (news === null) {
+    renderNews = <CircularProgress />;
+  } else if (news.length === 0) {
+    renderNews = (
+      <Typography>No news could be found with given filters.</Typography>
+    );
+  } else {
+    renderNews = news.map((elem) => {
+      return <News {...elem} key={elem.id} />;
+    });
+  }
+
   return (
     <Container
       maxWidth={"md"}
@@ -269,13 +283,7 @@ export default function Home() {
             justifyContent: "space-around",
           }}
         >
-          {news ? (
-            news.map((elem) => {
-              return <News {...elem} key={elem.id} />;
-            })
-          ) : (
-            <CircularProgress />
-          )}
+          {renderNews}
         </Box>
       </Grid>
     </Container>

@@ -104,12 +104,12 @@ Route::get('/get-news', function (Request $request) {
     return json_encode($result);
 });
 
-Route::get('/test-auth', function (Request $request) {
+Route::get('/check-auth', function (Request $request) {
     $user = $request->user();
     if ($user) {
-        return $user;
+        return response('authenticated', 200)->header('Content-Type', 'text/plain');
     }
     else {
-        return "not authenticated";
+            return response('not authenticated', 400)->header('Content-Type', 'text/plain');
     }
 });

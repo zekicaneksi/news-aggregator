@@ -14,6 +14,8 @@ import {
 import { useEffect, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
+import { fetchBackend } from "./_components/helper_functions";
+import { useRouter } from "next/navigation";
 
 function News(props: News) {
   return (
@@ -66,6 +68,10 @@ type News = {
 };
 
 export default function Home() {
+  const router = useRouter();
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesValue, setCategoriesValue] = useState<Category | null>(null);
 
@@ -80,11 +86,6 @@ export default function Home() {
   const [dateToValue, setDateToValue] = useState<Dayjs | null>(null);
 
   const [news, setNews] = useState<News[] | null>(null);
-
-  async function fetchBackend(route: string) {
-    const res = await fetch("/api" + route);
-    return res;
-  }
 
   async function getCategories() {
     let res = await fetchBackend("/get-categories");
@@ -129,6 +130,15 @@ export default function Home() {
       }
     });
   }
+
+  useEffect(() => {
+    async function checkAuth() {
+      const res = await fetchBackend("/check-auth");
+      if (res.status === 200) setIsAuthenticated(true);
+      else setIsAuthenticated(false);
+    }
+    if (isAuthenticated === null) checkAuth();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (news === null) getNews();
@@ -199,6 +209,62 @@ export default function Home() {
       </Button>
     );
 
+  let renderProfile;
+  if (isAuthenticated === null) renderProfile = null;
+  else if (isAuthenticated === false) {
+    renderProfile = (
+      <>
+        <Typography sx={{ float: "right" }}>
+          You can sign in to personalize your feed
+        </Typography>
+        <Button
+          sx={{ float: "right" }}
+          variant="contained"
+          color="secondary"
+          size="medium"
+          onClick={() => {
+            router.push("/login");
+          }}
+        >
+          SIGN IN
+        </Button>
+      </>
+    );
+  } else {
+    renderProfile = (
+      <>
+        <Button
+          sx={{ float: "right" }}
+          variant="contained"
+          color="secondary"
+          size="medium"
+          onClick={() => {
+            router.push("/preferences");
+          }}
+        >
+          Preferences
+        </Button>
+        <Button
+          sx={{ float: "right" }}
+          variant="contained"
+          color="secondary"
+          size="medium"
+          onClick={async () => {
+            await fetch("/api/logout", {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+              },
+            });
+            setIsAuthenticated(false);
+          }}
+        >
+          SIGN OUT
+        </Button>
+      </>
+    );
+  }
+
   return (
     <Container
       maxWidth={"md"}
@@ -209,11 +275,11 @@ export default function Home() {
           <Autocomplete
             disablePortal
             inputValue={keywordsInputValue}
-            onInputChange={(event, newInputValue) => {
+            onInputChange={(_, newInputValue) => {
               setKeywordsInputValue(newInputValue);
             }}
             value={keywordsValue}
-            onChange={(event: any, newValue: Keyword | null) => {
+            onChange={(_: any, newValue: Keyword | null) => {
               setKeywordsValue(newValue);
             }}
             id="auto-complete-keyword"
@@ -230,87 +296,7 @@ export default function Home() {
           />
         </Grid>
         <Grid item xs={7}>
-          <Typography sx={{ float: "right" }}>
-            You can sign in to personalize your feed
-          </Typography>
-          <Button
-            sx={{ float: "right" }}
-            variant="contained"
-            color="secondary"
-            size="medium"
-            onClick={async () => {
-              let formData = new FormData();
-              formData.append("name", "John");
-              formData.append("password", "!John123");
-              formData.append("email", "john@wick.com");
-              formData.append("password_confirmation", "!John123");
-
-              const res = await fetch("/api/register", {
-                method: "POST",
-                body: formData,
-                headers: {
-                  Accept: "application/json",
-                },
-              });
-            }}
-          >
-            SIGN UP
-          </Button>
-          <Button
-            sx={{ float: "right" }}
-            variant="contained"
-            color="secondary"
-            size="medium"
-            onClick={async () => {
-              const csrf = await fetch("/api/sanctum/csrf-cookie");
-
-              let formData = new FormData();
-              formData.append("email", "john@wick.com");
-              formData.append("password", "!John123");
-
-              const res = await fetch("/api/login", {
-                method: "POST",
-                body: formData,
-                headers: {
-                  Accept: "application/json",
-                },
-              });
-            }}
-          >
-            SIGN IN
-          </Button>
-          <Button
-            sx={{ float: "right" }}
-            variant="contained"
-            color="secondary"
-            size="medium"
-            onClick={async () => {
-              const res = await fetch("/api/logout", {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                },
-              });
-            }}
-          >
-            SIGN OUT
-          </Button>
-
-          <Button
-            sx={{ float: "right" }}
-            variant="contained"
-            color="secondary"
-            size="medium"
-            onClick={async () => {
-              const res = await fetch("/api/test-auth", {
-                headers: {
-                  Accept: "application/json",
-                },
-              });
-            }}
-          >
-            TEST AUTH
-          </Button>
+          {renderProfile}
         </Grid>
         <Typography variant="h4">LATEST NEWS</Typography>
         <Grid container sx={{ border: "5px solid black" }}>
@@ -318,7 +304,7 @@ export default function Home() {
             <Autocomplete
               disablePortal
               value={categoriesValue}
-              onChange={(event: any, newValue: Category | null) => {
+              onChange={(_: any, newValue: Category | null) => {
                 setCategoriesValue(newValue);
               }}
               id="auto-complete-category"
@@ -334,7 +320,7 @@ export default function Home() {
             <Autocomplete
               disablePortal
               value={sourcesValue}
-              onChange={(event: any, newValue: Source | null) => {
+              onChange={(_: any, newValue: Source | null) => {
                 setSourcesValue(newValue);
               }}
               id="auto-complete-source"

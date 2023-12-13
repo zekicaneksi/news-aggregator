@@ -120,7 +120,14 @@ export default function Home() {
 
     let res = await fetchBackend(fetchString);
     let content = await res.json();
-    setNews(content);
+    setNews((prev) => {
+      if (prev !== null && content[0].id !== prev[prev.length - 10].id) {
+        let toReturn = [...prev, ...content];
+        return toReturn;
+      } else {
+        return content;
+      }
+    });
   }
 
   useEffect(() => {
@@ -180,6 +187,17 @@ export default function Home() {
       return <News {...elem} key={elem.id} />;
     });
   }
+
+  let renderLoadMore;
+  if (news === null) renderLoadMore = null;
+  else if (Math.floor(news.length / 10) == 0)
+    renderLoadMore = <Typography>End of results</Typography>;
+  else
+    renderLoadMore = (
+      <Button variant={"contained"} onClick={getNews}>
+        Load More
+      </Button>
+    );
 
   return (
     <Container
@@ -286,6 +304,7 @@ export default function Home() {
           {renderNews}
         </Box>
       </Grid>
+      {renderLoadMore}
     </Container>
   );
 }

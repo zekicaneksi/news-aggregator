@@ -103,3 +103,13 @@ Route::get('/get-news', function (Request $request) {
 
     return json_encode($result);
 });
+
+Route::get('/test-auth', function (Request $request) {
+    $user = $request->user();
+    if ($user) {
+        return $user;
+    }
+    else {
+        return "not authenticated";
+    }
+});

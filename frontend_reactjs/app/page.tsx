@@ -238,8 +238,78 @@ export default function Home() {
             variant="contained"
             color="secondary"
             size="medium"
+            onClick={async () => {
+              let formData = new FormData();
+              formData.append("name", "John");
+              formData.append("password", "!John123");
+              formData.append("email", "john@wick.com");
+              formData.append("password_confirmation", "!John123");
+
+              const res = await fetch("/api/register", {
+                method: "POST",
+                body: formData,
+                headers: {
+                  Accept: "application/json",
+                },
+              });
+            }}
+          >
+            SIGN UP
+          </Button>
+          <Button
+            sx={{ float: "right" }}
+            variant="contained"
+            color="secondary"
+            size="medium"
+            onClick={async () => {
+              const csrf = await fetch("/api/sanctum/csrf-cookie");
+
+              let formData = new FormData();
+              formData.append("email", "john@wick.com");
+              formData.append("password", "!John123");
+
+              const res = await fetch("/api/login", {
+                method: "POST",
+                body: formData,
+                headers: {
+                  Accept: "application/json",
+                },
+              });
+            }}
           >
             SIGN IN
+          </Button>
+          <Button
+            sx={{ float: "right" }}
+            variant="contained"
+            color="secondary"
+            size="medium"
+            onClick={async () => {
+              const res = await fetch("/api/logout", {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                },
+              });
+            }}
+          >
+            SIGN OUT
+          </Button>
+
+          <Button
+            sx={{ float: "right" }}
+            variant="contained"
+            color="secondary"
+            size="medium"
+            onClick={async () => {
+              const res = await fetch("/api/test-auth", {
+                headers: {
+                  Accept: "application/json",
+                },
+              });
+            }}
+          >
+            TEST AUTH
           </Button>
         </Grid>
         <Typography variant="h4">LATEST NEWS</Typography>

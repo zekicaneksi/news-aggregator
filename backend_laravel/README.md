@@ -16,6 +16,14 @@ The app is able to fetch data from these API's;
 
 If you wish to fetch data from the given API's, the required API_KEYS should be obtained and set in the `.env` file.
 
+---
+
+The app uses Fortify/Sanctum for authentication. These env variables should be changed accordingly in the `.env` file depending on the environment;
+```
+SESSION_DOMAIN=
+SANCTUM_STATEFUL_DOMAINS=
+```
+
 To run the project and set up the database, run;
 ```
 composer install # install dependencies

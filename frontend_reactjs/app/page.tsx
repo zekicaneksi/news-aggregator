@@ -29,7 +29,9 @@ function News(props: News) {
           justifyContent: "space-between",
         }}
       >
-        <Typography>{props.author_name}</Typography>
+        <Typography>
+          {props.author_name ? props.author_name : "unknown"}
+        </Typography>
         <Typography>{props.date}</Typography>
       </Box>
     </Box>
@@ -114,6 +116,7 @@ export default function Home() {
       addQueryParameter("date_to", dateToValue.format("YYYY/MM/DD"));
 
     addQueryParameter("page", news ? news.length / 10 : 0);
+    fetchString = fetchString.slice(0, -1);
 
     let res = await fetchBackend(fetchString);
     let content = await res.json();
@@ -125,7 +128,7 @@ export default function Home() {
   }, [news]);
 
   useEffect(() => {
-    getNews();
+    setNews(null);
   }, [
     categoriesValue,
     sourcesValue,

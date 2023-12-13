@@ -93,10 +93,9 @@ Route::get('/get-news', function (Request $request) {
         $query->where('news.date', '>', $request->query('date_to'));
     }
 
-
-    $query->join('author', 'author.id' , '=', 'news.id');
-    $query->join('category', 'category.id' , '=', 'news.id');
-    $query->join('source', 'source.id' , '=', 'news.id');
+    $query->join('author', 'author.id' , '=', 'news.author_id');
+    $query->join('category', 'category.id' , '=', 'news.category_id');
+    $query->join('source', 'source.id' , '=', 'news.source_id');
 
     $query->select('author.name as author_name', 'source.name as source_name', 'headline', 'lead_paragraph', 'news.id', 'multimedia_url', 'category.name as category_name', 'external_link', 'date');
 

@@ -1,0 +1,9 @@
+.newsTabs {
+  padding: 1.5em;
+  border-radius: 2em;
+}
+
+.newsTabs:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}

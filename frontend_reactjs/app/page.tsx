@@ -22,6 +22,10 @@ import News from "./_components/News";
 export default function Home() {
   const router = useRouter();
 
+  const [selectedTab, setSelectedTab] = useState<"personal" | "general">(
+    "general",
+  );
+
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const [categories, setCategories] = useState<Category[] | null>(null);
@@ -67,6 +71,7 @@ export default function Home() {
       addQueryParameter("date_from", dateFromValue.format("YYYY/MM/DD"));
     if (dateToValue !== null)
       addQueryParameter("date_to", dateToValue.format("YYYY/MM/DD"));
+    if (selectedTab === "personal") addQueryParameter("personalized", "yes");
 
     addQueryParameter("page", news ? news.length / 10 : 0);
     fetchString = fetchString.slice(0, -1);
@@ -108,6 +113,7 @@ export default function Home() {
     keywordsInputValue,
     dateFromValue,
     dateToValue,
+    selectedTab,
   ]);
 
   useEffect(() => {
@@ -254,7 +260,43 @@ export default function Home() {
         <Grid item xs={7}>
           {renderProfile}
         </Grid>
-        <Typography variant="h4">LATEST NEWS</Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-around",
+            width: "100%",
+            flexWrap: "wrap",
+          }}
+        >
+          <Typography
+            variant="h4"
+            className={styles.newsTabs}
+            onClick={() => {
+              setSelectedTab("general");
+            }}
+            sx={{
+              backgroundColor: selectedTab === "general" ? "#ccc" : "#909090",
+            }}
+          >
+            LATEST NEWS
+          </Typography>
+          {isAuthenticated && (
+            <Typography
+              variant="h4"
+              className={styles.newsTabs}
+              onClick={() => {
+                setSelectedTab("personal");
+              }}
+              sx={{
+                backgroundColor:
+                  selectedTab === "personal" ? "#ccc" : "#909090",
+              }}
+            >
+              PERSONAL FEED
+            </Typography>
+          )}
+        </Box>
         <Grid container sx={{ border: "5px solid black" }}>
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete

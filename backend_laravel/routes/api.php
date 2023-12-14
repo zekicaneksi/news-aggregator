@@ -78,6 +78,13 @@ Route::get('/get-keywords', function (Request $request) {
 Route::get('/get-news', function (Request $request) {
 
     $query = DB::table('news');
+    $user = $request->user();
+
+    if($request->has('personalized') && $user){
+          $query->join('user_preference', function($join){
+	            $join->on('preference_target_id', '=', DB::raw('case preference_type_id when 1 then `news`.category_id when 2 then `news`.source_id when 3 then `news`.author_id end'));
+          });
+    }
 
     if($request->has('keyword_id') ) {
         $query->join('news_keyword', 'news.id', '=', 'news_keyword.news_id')

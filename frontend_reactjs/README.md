@@ -28,4 +28,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Docker
 
-A Dockerfile is provided for containerization.
+A Dockerfile is provided for containerization. It can be used for development with mount binding.

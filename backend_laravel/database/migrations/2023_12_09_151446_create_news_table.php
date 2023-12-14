@@ -57,6 +57,22 @@ return new class extends Migration
 		table: 'keyword', indexName: 'news_keyword_keyword_id'
 	    )->onUpdate('cascade')->onDelete('cascade');
         });
+        
+        Schema::create('preference', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+        });
+        
+        Schema::create('user_preference', function (Blueprint $table) {
+            $table->id();
+	    $table->foreignId('user_id')->constrained(
+		table: 'users', indexName: 'user_preference_user_id'
+	    )->onUpdate('cascade')->onDelete('cascade');
+	    $table->foreignId('preference_type_id')->constrained(
+		table: 'preference', indexName: 'user_preference_preference_id'
+	    )->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('preference_target_id');
+        });
 
     }
 

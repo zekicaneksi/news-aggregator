@@ -30,6 +30,7 @@ composer install # install dependencies
 php artisan key:generate # generate a Laravel app key
 ./vendor/bin/sail up -d # run the project locally
 until ./vendor/bin/sail artisan migrate; do echo -e "\n\n ---- waiting for database to get up"; sleep 5; done; # migrate the database
+./vendor/bin/sail artisan db:seed --class=PreferenceSeeder
 ```
     
 The project is now set up and running at `127.0.0.1:80`.

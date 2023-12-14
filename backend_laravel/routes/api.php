@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Classes\News;
 use App\Models\Category;
 use App\Models\Source;
+use App\Models\Author;
+use App\Models\UserPreference;
 use App\Models\Keyword;
 use App\Models\News as NewsModel;
 
@@ -54,6 +56,11 @@ Route::get('/fetch-news-remote', function (Request $request) {
 Route::get('/get-categories', function (Request $request) {
     $categories = Category::all();
 	return json_encode($categories);
+});
+
+Route::get('/get-authors', function (Request $request) {
+    $authors = Author::all();
+	return json_encode($authors);
 });
 
 Route::get('/get-sources', function (Request $request) {
@@ -112,4 +119,85 @@ Route::get('/check-auth', function (Request $request) {
     else {
             return response('not authenticated', 400)->header('Content-Type', 'text/plain');
     }
+});
+
+Route::get('/get-preferences', function (Request $request) {
+    $preference_name = $request->get('preference_name');
+    $user = $request->user();
+
+    if (!$user){
+        return response('not logged in', 400)->header('Content-Type', 'text/plain');
+    }
+    else if(!$preference_name) {
+        return response('missing preference_name query', 404)->header('Content-Type', 'text/plain');
+    }
+    else {
+        $result = DB::table('preference')
+            ->join('user_preference', 'preference.id', '=', 'user_preference.preference_type_id')
+            ->where('preference.name', '=', $preference_name)
+            ->where('user_preference.user_id', '=', $user->id)
+            ->select('user_preference.id as id', 'user_preference.preference_type_id', 'user_preference.preference_target_id')
+            ->get();
+
+        return $result;
+    }
+
+});
+
+Route::get('/check-preference', function (Request $request) {
+    $preference_name = $request->get('preference_name');
+
+    if(!$preference_name) {
+        return response('missing preference_name query', 404)->header('Content-Type', 'text/plain');
+    }
+    else {
+        $result = DB::table('preference')->where('preference.name', '=', $preference_name)->get();
+
+        return $result;
+    }
+});
+
+Route::get('/add-preference', function (Request $request) {
+    $user = $request->user();
+    $preference_type_id = $request->get('preference_type_id');
+    $preference_target_id = $request->get('preference_target_id');
+
+    if (!$user){
+        return response('not logged in', 400)->header('Content-Type', 'text/plain');
+    }
+    else if (!$preference_type_id || !$preference_target_id) {
+        return response('missing query parameter', 404)->header('Content-Type', 'text/plain');
+    }
+
+    $preference = new UserPreference;
+    $preference->user_id = $user->id;
+    $preference->preference_type_id = $preference_type_id;
+    $preference->preference_target_id = $preference_target_id;
+
+    $preference->save();
+
+    return Response::json(array('success' => true, 'last_insert_id' => $preference->id), 200);
+
+});
+
+Route::get('/delete-preference', function (Request $request) {
+    $user = $request->user();
+    $user_preference_id= $request->get('user_preference_id');
+
+    if (!$user){
+        return response('not logged in', 400)->header('Content-Type', 'text/plain');
+    }
+    else if (!$user_preference_id) {
+        return response('missing query parameter', 404)->header('Content-Type', 'text/plain');
+    }
+
+    $record = UserPreference::where('user_id', '=' ,$user->id)->where('id', '=', $user_preference_id)->get()[0];
+
+    if ($record) {
+
+        UserPreference::destroy($record->id);
+        return response('success', 200)->header('Content-Type', 'text/plain');
+    }
+
+
 });

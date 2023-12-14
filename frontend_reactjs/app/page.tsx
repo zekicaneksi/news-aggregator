@@ -16,76 +16,28 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { fetchBackend } from "./_components/helper_functions";
 import { useRouter } from "next/navigation";
-
-function News(props: News) {
-  return (
-    <Box width={350} height={500}>
-      <Typography>{props.headline}</Typography>
-      <Typography>{props.source_name}</Typography>
-      <img src={props.multimedia_url} width={"100%"} height={200} alt={"alt"} />
-      <Typography>{props.lead_paragraph}</Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography>
-          {props.author_name ? props.author_name : "unknown"}
-        </Typography>
-        <Typography>{props.date}</Typography>
-      </Box>
-    </Box>
-  );
-}
-
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Source = {
-  id: number;
-  name: string;
-};
-
-type Keyword = {
-  id: number;
-  name: string;
-};
-
-type News = {
-  id: number;
-  headline: string;
-  multimedia_url: string;
-  lead_paragraph: string;
-  category_name: number;
-  date: string;
-  source_name: number;
-  author_name: number;
-  external_link: string;
-};
+import { Category, Keyword, TNews, Source } from "./_components/News";
+import News from "./_components/News";
 
 export default function Home() {
   const router = useRouter();
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[] | null>(null);
   const [categoriesValue, setCategoriesValue] = useState<Category | null>(null);
 
-  const [sources, setSources] = useState<Source[]>([]);
+  const [sources, setSources] = useState<Source[] | null>(null);
   const [sourcesValue, setSourcesValue] = useState<Source | null>(null);
 
-  const [keywords, setKeywords] = useState<Keyword[]>([]);
+  const [keywords, setKeywords] = useState<Keyword[] | null>(null);
   const [keywordsValue, setKeywordsValue] = useState<Keyword | null>(null);
   const [keywordsInputValue, setKeywordsInputValue] = useState<string>("");
 
   const [dateFromValue, setDateFromValue] = useState<Dayjs | null>(null);
   const [dateToValue, setDateToValue] = useState<Dayjs | null>(null);
 
-  const [news, setNews] = useState<News[] | null>(null);
+  const [news, setNews] = useState<TNews[] | null>(null);
 
   async function getCategories() {
     let res = await fetchBackend("/get-categories");
@@ -122,7 +74,11 @@ export default function Home() {
     let res = await fetchBackend(fetchString);
     let content = await res.json();
     setNews((prev) => {
-      if (prev !== null && content[0].id !== prev[prev.length - 10].id) {
+      if (
+        prev !== null &&
+        content[0] &&
+        content[0].id !== prev[prev.length - 10].id
+      ) {
         let toReturn = [...prev, ...content];
         return toReturn;
       } else {
@@ -155,11 +111,11 @@ export default function Home() {
   ]);
 
   useEffect(() => {
-    if (categories.length === 0) getCategories();
+    if (categories === null) getCategories();
   }, [categories]);
 
   useEffect(() => {
-    if (sources.length === 0) getSources();
+    if (sources === null) getSources();
   }, [sources]);
 
   useEffect(() => {
@@ -283,7 +239,7 @@ export default function Home() {
               setKeywordsValue(newValue);
             }}
             id="auto-complete-keyword"
-            options={keywords}
+            options={keywords ? keywords : []}
             getOptionLabel={(option) => option.name}
             sx={{ width: 150 }}
             renderInput={(params) => (
@@ -308,7 +264,7 @@ export default function Home() {
                 setCategoriesValue(newValue);
               }}
               id="auto-complete-category"
-              options={categories}
+              options={categories ? categories : []}
               getOptionLabel={(option) => option.name}
               sx={{ width: 150 }}
               renderInput={(params) => (
@@ -324,7 +280,7 @@ export default function Home() {
                 setSourcesValue(newValue);
               }}
               id="auto-complete-source"
-              options={sources}
+              options={sources ? sources : []}
               getOptionLabel={(option) => option.name}
               sx={{ width: 150 }}
               renderInput={(params) => (

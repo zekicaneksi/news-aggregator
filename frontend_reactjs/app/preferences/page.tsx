@@ -10,6 +10,7 @@ import {
   ListItemIcon,
   ListItemText,
   TextField,
+  Typography,
 } from "@mui/material";
 
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -39,6 +40,7 @@ type PreferenceList = {
 function PreferenceList(props: {
   preferenceList: PreferenceList;
   setPreferenceList: Function;
+  title: string;
 }) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -67,6 +69,9 @@ function PreferenceList(props: {
 
   return (
     <Box width={"15em"} margin={"2em"}>
+      <Typography variant={"h4"} sx={{ textAlign: "center" }}>
+        {props.title}
+      </Typography>
       <TextField
         disabled={isLoading ? true : false}
         size={"small"}
@@ -204,6 +209,7 @@ export default function Page() {
           <PreferenceList
             preferenceList={categories}
             setPreferenceList={setCategories}
+            title={"Categories"}
           />
         ) : (
           <CircularProgress />
@@ -212,6 +218,7 @@ export default function Page() {
           <PreferenceList
             preferenceList={sources}
             setPreferenceList={setSources}
+            title={"Sources"}
           />
         ) : (
           <CircularProgress />
@@ -220,6 +227,7 @@ export default function Page() {
           <PreferenceList
             preferenceList={authors}
             setPreferenceList={setAuthors}
+            title={"Authors"}
           />
         ) : (
           <CircularProgress />

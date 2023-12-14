@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import styles from "./News.module.css";
 
 export type Category = {
   id: number;
@@ -29,7 +30,20 @@ export type TNews = {
 
 export default function News(props: TNews) {
   return (
-    <Box width={350} height={500}>
+    <Box
+      width={350}
+      height={500}
+      padding={"0.5em"}
+      border={"2px solid black"}
+      borderRadius={"0.5em"}
+      className={styles.container}
+      onClick={() => {
+        const w = window.open(props.external_link, "_blank");
+        if (w) {
+          w.focus();
+        }
+      }}
+    >
       <Typography>{props.headline}</Typography>
       <Typography>{props.source_name}</Typography>
       <img src={props.multimedia_url} width={"100%"} height={200} alt={"alt"} />

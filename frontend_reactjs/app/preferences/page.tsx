@@ -195,7 +195,11 @@ export default function Page() {
 
   return (
     <Container sx={{ minHeight: "100vh", backgroundColor: "#595353" }}>
-      <Button variant={"contained"} onClick={() => router.push("/")}>
+      <Button
+        variant={"contained"}
+        onClick={() => router.push("/")}
+        sx={{ margin: "1em" }}
+      >
         Back to News
       </Button>
       <Box
@@ -203,6 +207,7 @@ export default function Page() {
           display: "flex",
           flexDirection: "row",
           flexWrap: "wrap",
+          justifyContent: "space-around",
         }}
       >
         {categories ? (

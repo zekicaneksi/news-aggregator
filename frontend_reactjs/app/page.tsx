@@ -166,7 +166,11 @@ export default function Home() {
     renderLoadMore = <Typography>End of results</Typography>;
   else
     renderLoadMore = (
-      <Button variant={"contained"} onClick={getNews}>
+      <Button
+        variant={"contained"}
+        onClick={getNews}
+        sx={{ margin: "1.5em auto", display: "block" }}
+      >
         Load More
       </Button>
     );
@@ -175,12 +179,19 @@ export default function Home() {
   if (isAuthenticated === null) renderProfile = null;
   else if (isAuthenticated === false) {
     renderProfile = (
-      <>
-        <Typography sx={{ float: "right" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "end",
+        }}
+      >
+        <Typography sx={{ float: "right", margin: "1em" }}>
           You can sign in to personalize your feed
         </Typography>
         <Button
-          sx={{ float: "right" }}
+          sx={{ float: "right", marginRight: "1em" }}
           variant="contained"
           color="secondary"
           size="medium"
@@ -190,13 +201,13 @@ export default function Home() {
         >
           SIGN IN
         </Button>
-      </>
+      </Box>
     );
   } else {
     renderProfile = (
       <>
         <Button
-          sx={{ float: "right" }}
+          sx={{ float: "right", margin: "1em" }}
           variant="contained"
           color="secondary"
           size="medium"
@@ -207,7 +218,7 @@ export default function Home() {
           Preferences
         </Button>
         <Button
-          sx={{ float: "right" }}
+          sx={{ float: "right", margin: "1em" }}
           variant="contained"
           color="secondary"
           size="medium"
@@ -247,7 +258,7 @@ export default function Home() {
             id="auto-complete-keyword"
             options={keywords ? keywords : []}
             getOptionLabel={(option) => option.name}
-            sx={{ width: 150 }}
+            sx={{ width: 150, margin: "1em" }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -267,10 +278,11 @@ export default function Home() {
             justifyContent: "space-around",
             width: "100%",
             flexWrap: "wrap",
+            margin: "1em",
           }}
         >
           <Typography
-            variant="h4"
+            variant="h5"
             className={styles.newsTabs}
             onClick={() => {
               setSelectedTab("general");
@@ -283,7 +295,7 @@ export default function Home() {
           </Typography>
           {isAuthenticated && (
             <Typography
-              variant="h4"
+              variant="h5"
               className={styles.newsTabs}
               onClick={() => {
                 setSelectedTab("personal");
@@ -297,7 +309,15 @@ export default function Home() {
             </Typography>
           )}
         </Box>
-        <Grid container sx={{ border: "5px solid black" }}>
+        <Grid
+          container
+          sx={{
+            border: "5px solid black",
+            borderRadius: "1em",
+            padding: "0.5em",
+            margin: "1em",
+          }}
+        >
           <Grid item xs={12} sm={6} md={3}>
             <Autocomplete
               disablePortal
@@ -353,6 +373,7 @@ export default function Home() {
             justifyDirection: "row",
             flexWrap: "wrap",
             justifyContent: "space-around",
+            gap: "1em",
           }}
         >
           {renderNews}
